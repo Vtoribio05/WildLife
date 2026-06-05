@@ -19,8 +19,17 @@ builder.Services.AddSwaggerGen();
 // Configurar base de datos (PostgreSQL con NetTopologySuite)
 builder.Services.AddDbContext<WildlifeDbContext>(options =>
 {
+    var connectionString = builder.Configuration.GetConnectionString("PoolerConnection");
+
+    // Si todavía no configuras tu región del Pooler, usamos la conexión directa por defecto
+
+    if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("[TU_REGION]"))
+    {
+        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    }
+
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        connectionString,
         o => o.UseNetTopologySuite());
 });
 
@@ -47,12 +56,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configurar el pipeline de solicitudes HTTP.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Habilitar Swagger siempre (útil para que cargue aunque Visual Studio no envíe la variable de entorno 'Development')
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
