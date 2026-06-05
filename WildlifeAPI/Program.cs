@@ -1,22 +1,22 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.IO.Converters;
 using WildlifeAPI.Data;
 using WildlifeAPI.Services;
-using NetTopologySuite.IO.Converters;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Agregar servicios al contenedor.
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure Database (PostgreSQL with NetTopologySuite)
+// Configurar base de datos (PostgreSQL con NetTopologySuite)
 builder.Services.AddDbContext<WildlifeDbContext>(options =>
 {
     options.UseNpgsql(
@@ -24,7 +24,7 @@ builder.Services.AddDbContext<WildlifeDbContext>(options =>
         o => o.UseNetTopologySuite());
 });
 
-// Configure Dependency Injection for Custom Interface (AI)
+// Configurar Inyección de Dependencias para Interfaz Personalizada (IA)
 builder.Services.AddHttpClient<IAiChatService, AiChatService>();
 
 var app = builder.Build();
@@ -44,7 +44,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// Configurar el pipeline de solicitudes HTTP.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
