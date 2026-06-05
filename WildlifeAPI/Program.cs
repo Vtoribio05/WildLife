@@ -29,6 +29,9 @@ builder.Services.AddHttpClient<IAiChatService, AiChatService>();
 
 var app = builder.Build();
 
+// Forzar que la aplicación siempre se ejecute en el puerto 5085
+app.Urls.Add("http://localhost:5085");
+
 // Ejecutar el Data Seeder para llenar la base de datos si está vacía
 using (var scope = app.Services.CreateScope())
 {
