@@ -29,6 +29,21 @@ builder.Services.AddHttpClient<IAiChatService, AiChatService>();
 
 var app = builder.Build();
 
+// Ejecutar el Data Seeder para llenar la base de datos si está vacía
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        await DataSeeder.InitializeAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error al sembrar la base de datos automáticamente.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
