@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --bg-dark: #0f172a;
+    --bg-darker: #020617;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent-green: #10b981;
+    --accent-green-hover: #059669;
+    --surface-glass: rgba(15, 23, 42, 0.6);
+    --border-glass: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    background: radial-gradient(circle at top right, #0f172a, #020617);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+
+/* Base styles for Blazor Error UI */
+#blazor-error-ui {
+    background: #ef4444;
+    color: white;
+    bottom: 0;
+    box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.5);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+/* Mapbox Overrides for Dark Mode Popups */
+.dark-popup .mapboxgl-popup-content {
+    background: #1a1b1d !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #333 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    padding: 0 !important;
+}
+
+.mapboxgl-popup-tip {
+    border-top-color: #1a1b1d !important;
+    border-bottom-color: #1a1b1d !important;
+}
+
+.mapboxgl-popup-close-button {
+    color: #999 !important;
+}
+
+.mapboxgl-popup-close-button:hover {
+    color: #fff !important;
+    background-color: transparent !important;
+}

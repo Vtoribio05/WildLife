@@ -102,5 +102,39 @@ namespace WildlifeAPI.Controllers
         {
             return _context.Avistamientos.Any(e => e.Id == id);
         }
+        [HttpGet("FixSpeciesData")]
+        public async Task<IActionResult> FixSpeciesData([FromServices] WildlifeAPI.Services.IWikipediaService wikiService)
+        {
+            var especies = await _context.Especies.ToListAsync();
+            var results = new List<string>();
+            foreach(var e in especies)
+            {
+                var info = await wikiService.GetAnimalInfoAsync(e.NombreComun);
+                bool updated = false;
+                
+                if (info.ImageUrl != null && e.FotoUrl != info.ImageUrl)
+                {
+                    e.FotoUrl = info.ImageUrl;
+                    updated = true;
+                }
+                
+                if (!string.IsNullOrEmpty(info.Description) && (string.IsNullOrEmpty(e.Descripcion) || e.Descripcion.Contains("asombrosa")))
+                {
+                    e.Descripcion = info.Description;
+                    updated = true;
+                }
+
+                if (updated)
+                {
+                    results.Add($"Actualizado {e.NombreComun}");
+                }
+                else
+                {
+                    results.Add($"Ya estaba bien {e.NombreComun}");
+                }
+            }
+            await _context.SaveChangesAsync();
+            return Ok(results);
+        }
     }
 }

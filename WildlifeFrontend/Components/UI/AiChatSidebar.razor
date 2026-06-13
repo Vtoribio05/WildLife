@@ -1,0 +1,221 @@
+@using WildlifeFrontend.Services
+@inject IWildlifeApiService ApiService
+
+<div class="chat-sidebar glass-panel">
+    <div class="chat-header">
+        <div class="avatar-container">
+            <span class="chat-icon">🤖</span>
+        </div>
+        <div>
+            <strong>Asistente de IA</strong><br/>
+            <small>Wildlife Global Explorer</small>
+        </div>
+    </div>
+    
+    <div class="chat-messages">
+        @foreach (var msg in Messages)
+        {
+            <div class="message @(msg.IsUser ? "user" : "ai")">
+                <div class="msg-content">@msg.Text</div>
+            </div>
+        }
+        @if (IsLoading)
+        {
+            <div class="message ai">
+                <div class="msg-content loading">Escribiendo...</div>
+            </div>
+        }
+    </div>
+    
+    <div class="chat-input-area">
+        <input type="text" @bind="InputMessage" @bind:event="oninput" @onkeyup="HandleKeyUp" placeholder="Ej: Muéstrame mamíferos marinos..." class="chat-input" disabled="@IsLoading" />
+        <button class="chat-send" @onclick="SendMessage" disabled="@(string.IsNullOrWhiteSpace(InputMessage) || IsLoading)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<ChatbotResponse> OnAnimalFound { get; set; }
+
+    private string InputMessage = "";
+    private bool IsLoading = false;
+    private List<ChatMessage> Messages = new()
+    {
+        new ChatMessage { IsUser = false, Text = "¡Hola! Soy tu asistente de vida silvestre. Pregúntame sobre especies en todo el mundo." }
+    };
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(InputMessage)) return;
+
+        var userMsg = InputMessage;
+        InputMessage = "";
+        
+        Messages.Add(new ChatMessage { IsUser = true, Text = userMsg });
+        IsLoading = true;
+        StateHasChanged();
+
+        var aiResponse = await ApiService.SendChatMessageAsync(userMsg);
+        
+        Messages.Add(new ChatMessage { IsUser = false, Text = aiResponse.Answer });
+        IsLoading = false;
+        
+        if (!string.IsNullOrWhiteSpace(aiResponse.AnimalName) && aiResponse.Longitude.HasValue && aiResponse.Latitude.HasValue)
+        {
+            await OnAnimalFound.InvokeAsync(aiResponse);
+        }
+    }
+
+    private class ChatMessage
+    {
+        public bool IsUser { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+}
+
+<style>
+    .chat-sidebar {
+        width: 380px;
+        height: calc(100vh - 48px);
+        position: absolute;
+        right: 24px;
+        top: 24px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        background: rgba(15, 23, 42, 0.9);
+    }
+    
+    .chat-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-glass);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .avatar-container {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .chat-icon {
+        font-size: 1.5rem;
+    }
+
+    .chat-header strong {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .chat-header small {
+        color: var(--text-muted);
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .message {
+        max-width: 85%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .message.user {
+        align-self: flex-end;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-glass);
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message.ai {
+        align-self: flex-start;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-bottom-left-radius: 4px;
+    }
+    
+    .loading {
+        font-style: italic;
+        opacity: 0.7;
+    }
+    
+    .chat-input-area {
+        padding: 20px;
+        border-top: 1px solid var(--border-glass);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-glass);
+        color: white;
+        padding: 14px 20px;
+        border-radius: 50px;
+        outline: none;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+    
+    .chat-input:focus {
+        border-color: var(--accent-green);
+    }
+    
+    .chat-send {
+        background: var(--accent-green);
+        color: #000;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .chat-send:hover:not(:disabled) {
+        transform: scale(1.05);
+        background: var(--accent-green-hover);
+    }
+    
+    .chat-send:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+</style>

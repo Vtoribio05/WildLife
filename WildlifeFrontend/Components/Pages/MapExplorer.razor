@@ -1,0 +1,162 @@
+@page "/mapa"
+@rendermode InteractiveServer
+@using WildlifeFrontend.Models
+@using WildlifeFrontend.Services
+@using WildlifeFrontend.Components.UI
+@inject IWildlifeApiService ApiService
+
+<PageTitle>EspeciesMap - WildLife</PageTitle>
+
+<div class="map-layout">
+    <div class="top-bar">
+        <div class="brand">EspeciesMap</div>
+        <div class="filters pill-nav-mini">
+            <button class="@(currentFilter == "Terrestres" ? "active" : "")" @onclick="@(() => Filter("Terrestres"))">Terrestres</button>
+            <button class="@(currentFilter == "Marinos" ? "active" : "")" @onclick="@(() => Filter("Marinos"))">Marinos</button>
+            <button class="@(currentFilter == "Todos" ? "active" : "")" @onclick="@(() => Filter("Todos"))">Todos</button>
+        </div>
+        <div class="menu-icon">☰</div>
+    </div>
+
+    <!-- Map Component -->
+    <WildlifeMap @ref="mapComponent" Avistamientos="filteredAvistamientos" />
+
+    <!-- Chatbot Component -->
+    <AiChatSidebar OnAnimalFound="HandleAnimalFound" />
+</div>
+
+@code {
+    private IEnumerable<Avistamiento> allAvistamientos = new List<Avistamiento>();
+    private IEnumerable<Avistamiento> filteredAvistamientos = new List<Avistamiento>();
+    private WildlifeMap? mapComponent;
+    private string currentFilter = "Todos";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await ApiService.GetAvistamientosAsync();
+        if (data != null)
+        {
+            allAvistamientos = data;
+            filteredAvistamientos = allAvistamientos;
+        }
+    }
+
+    private void Filter(string tipo)
+    {
+        currentFilter = tipo;
+        if (tipo == "Todos")
+        {
+            filteredAvistamientos = allAvistamientos;
+        }
+        else if (tipo == "Marinos")
+        {
+            filteredAvistamientos = allAvistamientos.Where(a => IsMarino(a.Especie)).ToList();
+        }
+        else if (tipo == "Terrestres")
+        {
+            filteredAvistamientos = allAvistamientos.Where(a => !IsMarino(a.Especie)).ToList();
+        }
+    }
+
+    private bool IsMarino(Especie? especie)
+    {
+        if (especie == null) return false;
+        
+        string nombre = especie.NombreComun.ToLower();
+        return especie.Tipo == "Pez" || 
+               nombre.Contains("ballena") || 
+               nombre.Contains("delfín") || 
+               nombre.Contains("tortuga") || 
+               nombre.Contains("mantarraya") ||
+               nombre.Contains("tiburón");
+    }
+
+    private async Task HandleAnimalFound(ChatbotResponse response)
+    {
+        if (mapComponent == null) return;
+        
+        // Primero intentamos buscarlo en nuestra base de datos
+        var sighting = allAvistamientos.FirstOrDefault(a => 
+            a.Especie != null && 
+            !string.IsNullOrWhiteSpace(response.AnimalName) &&
+            a.Especie.NombreComun.Contains(response.AnimalName, StringComparison.OrdinalIgnoreCase));
+            
+        if (sighting != null && sighting.Coordenadas != null)
+        {
+            // Focus on map
+            double lat = sighting.Coordenadas.Coordinates[1];
+            double lng = sighting.Coordenadas.Coordinates[0];
+            await mapComponent.FlyToAsync(lng, lat);
+        }
+        else if (response.Longitude.HasValue && response.Latitude.HasValue)
+        {
+            // El animal no está en la base de datos, así que usamos el marcador dinámico de la IA
+            string title = !string.IsNullOrWhiteSpace(response.AnimalName) ? response.AnimalName : "Animal desconocido";
+            string desc = !string.IsNullOrWhiteSpace(response.Description) ? response.Description : "No hay descripción disponible.";
+            string biome = !string.IsNullOrWhiteSpace(response.Biome) ? response.Biome : "Desconocido";
+            string fotoUrl = !string.IsNullOrWhiteSpace(response.FotoUrl) ? response.FotoUrl : "";
+            await mapComponent.AddDynamicMarkerAsync(response.Longitude.Value, response.Latitude.Value, title, desc, biome, fotoUrl);
+        }
+    }
+}
+
+<style>
+    .map-layout {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .top-bar {
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        right: 24px;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none; /* Let clicks pass through empty space */
+    }
+    
+    .top-bar > * {
+        pointer-events: auto; /* Re-enable clicks on elements */
+    }
+    
+    .brand {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #e5cd9e; /* Dorado según la imagen */
+    }
+    
+    .pill-nav-mini {
+        display: flex;
+        background: rgba(10, 20, 15, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border-glass);
+        border-radius: 50px;
+        padding: 4px;
+    }
+    
+    .pill-nav-mini button {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .pill-nav-mini button.active {
+        background: #e5cd9e;
+        color: #000;
+        font-weight: 600;
+    }
+    
+    .menu-icon {
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+</style>

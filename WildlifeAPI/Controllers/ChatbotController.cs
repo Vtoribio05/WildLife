@@ -32,7 +32,7 @@ namespace WildlifeAPI.Controllers
             _logger.LogInformation("Recibiendo pregunta para el chatbot IA.");
             var response = await _aiChatService.ProcessQuestionAsync(request.Question);
             
-            return Ok(new { Answer = response });
+            return Content(response, "application/json");
         }
     }
 }

@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 # App Settings secrets
 WildlifeAPI/appsettings.json
 WildlifeAPI/appsettings.Development.json
+
+WildlifeFrontend/appsettings.json
+WildlifeFrontend/appsettings.Development.json

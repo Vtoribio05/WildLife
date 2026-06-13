@@ -1,8 +1,8 @@
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.IO.Converters;
 using WildlifeAPI.Data;
 using WildlifeAPI.Services;
+using NetTopologySuite.IO.Converters;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,27 +19,16 @@ builder.Services.AddSwaggerGen();
 // Configurar base de datos (PostgreSQL con NetTopologySuite)
 builder.Services.AddDbContext<WildlifeDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("PoolerConnection");
-
-    // Si todavía no configuras tu región del Pooler, usamos la conexión directa por defecto
-
-    if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("[TU_REGION]"))
-    {
-        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    }
-
     options.UseNpgsql(
-        connectionString,
+        builder.Configuration.GetConnectionString("DefaultConnection"),
         o => o.UseNetTopologySuite());
 });
 
 // Configurar Inyección de Dependencias para Interfaz Personalizada (IA)
 builder.Services.AddHttpClient<IAiChatService, AiChatService>();
+builder.Services.AddHttpClient<IWikipediaService, WikipediaService>();
 
 var app = builder.Build();
-
-// Forzar que la aplicación siempre se ejecute en el puerto 5085
-app.Urls.Add("http://localhost:5085");
 
 // Ejecutar el Data Seeder para llenar la base de datos si está vacía
 using (var scope = app.Services.CreateScope())
@@ -56,9 +45,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Habilitar Swagger siempre (útil para que cargue aunque Visual Studio no envíe la variable de entorno 'Development')
-app.UseSwagger();
-app.UseSwaggerUI();
+// Configurar el pipeline de solicitudes HTTP.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 

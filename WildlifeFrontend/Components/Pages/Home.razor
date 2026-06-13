@@ -1,0 +1,217 @@
+@page "/"
+
+<PageTitle>Inicio - WildLife</PageTitle>
+
+<div class="landing-hero">
+    <!-- Navbar -->
+    <nav class="top-nav">
+        <div class="brand">EspeciesMap</div>
+        <div class="nav-links">
+            <a href="/" class="active">Inicio</a>
+            <a href="#">Funciones</a>
+            <a href="#">Misión</a>
+            <a href="#">Desarrollador</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="hero-content">
+        <h1 class="hero-title">
+            Monitoreo de <span class="highlight">Especies</span><br/>
+            en Tiempo Real con IA
+        </h1>
+        
+        <a href="/mapa" class="btn-lanzar">
+            Lanzar Plataforma
+        </a>
+    </div>
+
+    <!-- Bottom Features -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            </div>
+            <h3>Mapas Interactivos<br/>Detallados</h3>
+        </div>
+        
+        <div class="feature-card">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h3>Asistente IA<br/>Chatbot</h3>
+        </div>
+        
+        <div class="feature-card">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h3>Alertas de<br/>Conservación</h3>
+        </div>
+        
+        <div class="feature-card">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+            </div>
+            <h3>Base de Datos<br/>Geoespacial</h3>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --brand-gold: #f5c862;
+        --brand-gold-glow: rgba(245, 200, 98, 0.4);
+        --bg-panel: #1e1e1e;
+        --text-color: #f0f0f0;
+    }
+
+    body {
+        margin: 0;
+        background-color: #121212;
+        color: var(--text-color);
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .landing-hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image: url('images/bg-wireframe.png'); /* Abstract map wireframe */
+        background-size: cover;
+        background-position: center;
+        background-blend-mode: overlay;
+        background-color: #161819;
+    }
+
+    /* Navbar */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 60px;
+        background: transparent;
+    }
+
+    .brand {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--brand-gold);
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 32px;
+    }
+
+    .nav-links a {
+        color: #b0b0b0;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1rem;
+        position: relative;
+        padding-bottom: 4px;
+        transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+        color: #ffffff;
+    }
+
+    .nav-links a.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--brand-gold);
+    }
+
+    /* Hero Center */
+    .hero-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-top: -60px; /* Slight offset to perfectly center visually */
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 48px;
+        color: #ffffff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .highlight {
+        color: var(--brand-gold);
+    }
+
+    .btn-lanzar {
+        background-color: var(--brand-gold);
+        color: #121212;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 18px 40px;
+        border-radius: 12px;
+        text-decoration: none;
+        box-shadow: 0 0 30px var(--brand-gold-glow);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-lanzar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 40px var(--brand-gold-glow);
+        background-color: #ffda78;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        padding: 0 60px 40px 60px;
+    }
+
+    .feature-card {
+        background-color: #242528;
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        transition: transform 0.2s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #444;
+    }
+
+    .icon-box {
+        background-color: #1a1b1d;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        color: var(--brand-gold);
+    }
+
+    .feature-card h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+        line-height: 1.4;
+    }
+</style>

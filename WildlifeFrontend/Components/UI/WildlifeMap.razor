@@ -1,0 +1,80 @@
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+@using WildlifeFrontend.Models
+
+<div id="wildlife-map" class="map-container"></div>
+
+@code {
+    [Parameter]
+    public IEnumerable<Avistamiento> Avistamientos { get; set; } = new List<Avistamiento>();
+
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = Configuration["MapboxToken"] ?? "EMPTY_TOKEN";
+            Console.WriteLine($"[WildlifeMap] OnAfterRenderAsync called. Token length: {token.Length}");
+            
+            try 
+            {
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/map.js?v=8");
+                await module.InvokeVoidAsync("initMap", "wildlife-map", token);
+                Console.WriteLine("[WildlifeMap] initMap called successfully via JS interop.");
+                
+                if (Avistamientos.Any())
+                {
+                    await module.InvokeVoidAsync("addMarkers", Avistamientos);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WildlifeMap] Exception in JS Interop: {ex.Message}");
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("addMarkers", Avistamientos);
+        }
+    }
+
+    public async Task FocusMapAsync(double lat, double lng)
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("focusMap", lat, lng);
+        }
+    }
+
+    public async Task FlyToAsync(double lng, double lat)
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("flyToLocation", lng, lat);
+        }
+    }
+
+    public async Task AddDynamicMarkerAsync(double lng, double lat, string title, string description, string biome, string fotoUrl)
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("addDynamicMarker", lng, lat, title, description, biome, fotoUrl);
+        }
+    }
+}
+
+<style>
+    .map-container {
+        width: 100%;
+        height: 100vh; /* Full screen background */
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1; /* Below the UI elements */
+    }
+</style>

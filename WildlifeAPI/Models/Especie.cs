@@ -7,6 +7,10 @@ namespace WildlifeAPI.Models
         public string Tipo { get; set; } = string.Empty; // Marino o Terrestre
         public bool EnPeligroExtincion { get; set; }
         
+        public string? Descripcion { get; set; }
+        public string? Bioma { get; set; }
+        public string? FotoUrl { get; set; }
+        
         public ICollection<Avistamiento> Avistamientos { get; set; } = new List<Avistamiento>();
     }
 }

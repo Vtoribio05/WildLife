@@ -14,14 +14,31 @@ namespace WildlifeAPI.Data
             using var context = new WildlifeDbContext(
                 serviceProvider.GetRequiredService<DbContextOptions<WildlifeDbContext>>());
 
+            var especiesExistentes = await context.Especies.ToListAsync();
+            var wikiService = serviceProvider.GetRequiredService<WildlifeAPI.Services.IWikipediaService>();
+            
+            // Backfill new properties for existing species
+            bool hasUpdates = false;
+            foreach(var e in especiesExistentes)
+            {
+                if(string.IsNullOrEmpty(e.Descripcion) || e.Descripcion.Contains("asombrosa") || (e.FotoUrl != null && e.FotoUrl.Contains("loremflickr")))
+                {
+                    var wikiInfo = await wikiService.GetAnimalInfoAsync(e.NombreComun);
+                    e.Descripcion = !string.IsNullOrEmpty(wikiInfo.Description) ? wikiInfo.Description : $"El {e.NombreComun} es una especie asombrosa de nuestro planeta.";
+                    e.Bioma = e.Tipo == "Marino" ? "Océano" : "Terrestre / Bosque";
+                    e.FotoUrl = wikiInfo.ImageUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(e.NombreComun)}";
+                    hasUpdates = true;
+                }
+            }
+            if (hasUpdates) await context.SaveChangesAsync();
+
             // Si ya tenemos suficientes especies, no volvemos a descargar datos para no duplicar
-            if (await context.Especies.CountAsync() >= 30)
+            if (especiesExistentes.Count >= 30)
             {
                 return;
             }
 
-            // Descargamos los nombres de las especies que ya están en la BD para no repetirlas
-            var especiesExistentes = await context.Especies.Select(e => e.NombreComun).ToListAsync();
+            var nombresExistentes = especiesExistentes.Select(e => e.NombreComun).ToList();
 
             // Nombres científicos y datos biológicos base (¡Aumentado a 30 animales fascinantes!)
             var animalesBase = new Dictionary<string, (string NombreComun, string Tipo, bool Peligro)>
@@ -76,7 +93,7 @@ namespace WildlifeAPI.Data
             foreach (var animal in animalesBase)
             {
                 // Si el animal ya está en la base de datos, lo saltamos
-                if (especiesExistentes.Contains(animal.Value.NombreComun))
+                if (nombresExistentes.Contains(animal.Value.NombreComun))
                     continue;
                 var query = Uri.EscapeDataString(animal.Key);
                 var url = $"https://api.gbif.org/v1/occurrence/search?q={query}&limit=1&hasCoordinate=true";
@@ -96,11 +113,15 @@ namespace WildlifeAPI.Data
                         double lat = record.GetProperty("decimalLatitude").GetDouble();
                         double lon = record.GetProperty("decimalLongitude").GetDouble();
 
+                        var wikiInfo = await wikiService.GetAnimalInfoAsync(animal.Value.NombreComun);
                         var nuevaEspecie = new Especie
                         {
                             NombreComun = animal.Value.NombreComun,
                             Tipo = animal.Value.Tipo,
-                            EnPeligroExtincion = animal.Value.Peligro
+                            EnPeligroExtincion = animal.Value.Peligro,
+                            Descripcion = !string.IsNullOrEmpty(wikiInfo.Description) ? wikiInfo.Description : $"El {animal.Value.NombreComun} es una especie asombrosa de nuestro planeta.",
+                            Bioma = animal.Value.Tipo == "Marino" ? "Océano" : "Terrestre / Bosque",
+                            FotoUrl = wikiInfo.ImageUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(animal.Value.NombreComun)}"
                         };
 
                         especiesInsertadas.Add(nuevaEspecie);
