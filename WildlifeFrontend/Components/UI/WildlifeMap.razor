@@ -19,7 +19,7 @@
             
             try 
             {
-                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/map.js?v=8");
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/map.js?v=10");
                 await module.InvokeVoidAsync("initMap", "wildlife-map", token);
                 Console.WriteLine("[WildlifeMap] initMap called successfully via JS interop.");
                 

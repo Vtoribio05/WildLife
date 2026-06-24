@@ -5,17 +5,49 @@
 @using WildlifeFrontend.Components.UI
 @inject IWildlifeApiService ApiService
 
-<PageTitle>EspeciesMap - WildLife</PageTitle>
+<PageTitle>Mapa - WildLife</PageTitle>
 
 <div class="map-layout">
-    <div class="top-bar">
-        <div class="brand">EspeciesMap</div>
-        <div class="filters pill-nav-mini">
-            <button class="@(currentFilter == "Terrestres" ? "active" : "")" @onclick="@(() => Filter("Terrestres"))">Terrestres</button>
-            <button class="@(currentFilter == "Marinos" ? "active" : "")" @onclick="@(() => Filter("Marinos"))">Marinos</button>
-            <button class="@(currentFilter == "Todos" ? "active" : "")" @onclick="@(() => Filter("Todos"))">Todos</button>
+    <!-- Top Navigation Bar -->
+    <div class="map-topbar">
+        <a href="/" class="map-brand" title="Volver al inicio" id="btn-back-home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>WildLife</span>
+        </a>
+
+        <div class="filter-pills" id="filter-pills">
+            <button class="filter-btn @(currentFilter == "Terrestres" ? "active" : "")" @onclick="@(() => Filter("Terrestres"))">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                </svg>
+                Terrestres
+            </button>
+            <button class="filter-btn @(currentFilter == "Marinos" ? "active" : "")" @onclick="@(() => Filter("Marinos"))">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12h2a8 8 0 1 0 16 0h2"/>
+                    <path d="M2 12c2-2 4-3 6-3s4 1 6 3c2 2 4 3 6 3"/>
+                </svg>
+                Marinos
+            </button>
+            <button class="filter-btn @(currentFilter == "Todos" ? "active" : "")" @onclick="@(() => Filter("Todos"))">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                Todos
+            </button>
         </div>
-        <div class="menu-icon">☰</div>
+
+        <div class="topbar-right">
+            <div class="sighting-count">
+                <span class="count-dot"></span>
+                <span>@filteredAvistamientos.Count() avistamientos</span>
+            </div>
+        </div>
     </div>
 
     <!-- Map Component -->
@@ -101,62 +133,171 @@
 }
 
 <style>
+    /* ===== MAP LAYOUT ===== */
     .map-layout {
         position: relative;
         width: 100vw;
         height: 100vh;
         overflow: hidden;
+        background: #0a0b0d;
     }
     
-    .top-bar {
+    /* ===== TOP BAR ===== */
+    .map-topbar {
         position: absolute;
-        top: 24px;
-        left: 24px;
-        right: 24px;
+        top: 0;
+        left: 0;
+        right: 0;
         z-index: 10;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        pointer-events: none; /* Let clicks pass through empty space */
+        padding: 14px 24px;
+        background: linear-gradient(180deg, rgba(10, 11, 13, 0.85) 0%, rgba(10, 11, 13, 0.4) 80%, transparent 100%);
+        pointer-events: none;
     }
     
-    .top-bar > * {
-        pointer-events: auto; /* Re-enable clicks on elements */
+    .map-topbar > * {
+        pointer-events: auto;
     }
-    
-    .brand {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #e5cd9e; /* Dorado según la imagen */
-    }
-    
-    .pill-nav-mini {
+
+    /* Brand / Back Button */
+    .map-brand {
         display: flex;
-        background: rgba(10, 20, 15, 0.8);
-        backdrop-filter: blur(8px);
-        border: 1px solid var(--border-glass);
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: #f5c862;
+        font-size: 1.15rem;
+        font-weight: 700;
+        background: rgba(10, 11, 13, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(245, 200, 98, 0.15);
+        border-radius: 50px;
+        padding: 10px 20px 10px 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .map-brand:hover {
+        background: rgba(245, 200, 98, 0.1);
+        border-color: rgba(245, 200, 98, 0.4);
+        transform: translateX(-3px);
+        box-shadow: 0 4px 20px rgba(245, 200, 98, 0.1);
+    }
+    
+    .map-brand svg {
+        transition: transform 0.3s ease;
+    }
+    
+    .map-brand:hover svg {
+        transform: translateX(-3px);
+    }
+
+    /* Filter Pills */
+    .filter-pills {
+        display: flex;
+        background: rgba(10, 11, 13, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 50px;
         padding: 4px;
+        gap: 2px;
     }
     
-    .pill-nav-mini button {
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         background: transparent;
         border: none;
-        color: white;
-        padding: 8px 16px;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 9px 18px;
         border-radius: 50px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        font-size: 0.88rem;
+        font-weight: 500;
+        font-family: inherit;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .pill-nav-mini button.active {
-        background: #e5cd9e;
-        color: #000;
-        font-weight: 600;
+    .filter-btn:hover {
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.05);
     }
     
-    .menu-icon {
-        font-size: 1.5rem;
-        cursor: pointer;
+    .filter-btn.active {
+        background: linear-gradient(135deg, #f5c862, #e8a838);
+        color: #0a0b0d;
+        font-weight: 700;
+        box-shadow: 0 2px 12px rgba(245, 200, 98, 0.3);
+    }
+    
+    .filter-btn.active svg {
+        stroke: #0a0b0d;
+    }
+
+    /* Topbar Right */
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .sighting-count {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(10, 11, 13, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 50px;
+        padding: 10px 18px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .count-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse-dot 2s infinite;
+    }
+
+    @@keyframes pulse-dot {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .map-topbar {
+            padding: 10px 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-pills {
+            order: 3;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .sighting-count {
+            font-size: 0.78rem;
+            padding: 8px 14px;
+        }
+
+        .map-brand span {
+            display: none;
+        }
+
+        .map-brand {
+            padding: 10px 14px;
+        }
     }
 </style>

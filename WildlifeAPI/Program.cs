@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WildlifeDbContext>(options =>
 {
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        builder.Configuration.GetConnectionString("PoolerConnection"),
         o => o.UseNetTopologySuite());
 });
 

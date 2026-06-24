@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run WildlifeAPI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-api",
+            "program": "${workspaceFolder}/WildlifeAPI/bin/Debug/net8.0/WildlifeAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/WildlifeAPI",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Run WildlifeFrontend",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-frontend",
+            "program": "${workspaceFolder}/WildlifeFrontend/bin/Debug/net9.0/WildlifeFrontend.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/WildlifeFrontend",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Run Full Stack (API + Frontend)",
+            "configurations": [
+                "Run WildlifeAPI",
+                "Run WildlifeFrontend"
+            ]
+        }
+    ]
+}
