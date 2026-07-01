@@ -11,10 +11,12 @@ namespace WildlifeAPI.Services
     public class WikipediaService : IWikipediaService
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public WikipediaService(HttpClient httpClient)
+        public WikipediaService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _configuration = configuration;
             // Set User-Agent as required by Wikipedia API
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "WildlifeApp/1.0 (arturo@example.com)");
         }
@@ -35,12 +37,12 @@ namespace WildlifeAPI.Services
             var query = Uri.EscapeDataString(animalName.ToLower());
             
             // Intento 1: Wikipedia en Español (Búsqueda en texto en lugar de título exacto)
-            var urlEs = $"https://es.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={query}&gsrlimit=1&prop=pageimages|extracts&format=json&piprop=original&exintro=1&explaintext=1";
+            var urlEs = string.Format(_configuration["ExternalApis:WikipediaBaseUrlEs"] ?? "https://es.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={0}&gsrlimit=1&prop=pageimages|extracts&format=json&piprop=original&exintro=1&explaintext=1", query);
             var resultEs = await FetchInfoFromUrl(urlEs);
             if (resultEs.ImageUrl != null || resultEs.Description != null) return resultEs;
 
             // Intento 2: Wikipedia en Inglés
-            var urlEn = $"https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={query}&gsrlimit=1&prop=pageimages|extracts&format=json&piprop=original&exintro=1&explaintext=1";
+            var urlEn = string.Format(_configuration["ExternalApis:WikipediaBaseUrlEn"] ?? "https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch={0}&gsrlimit=1&prop=pageimages|extracts&format=json&piprop=original&exintro=1&explaintext=1", query);
             return await FetchInfoFromUrl(urlEn);
         }
 

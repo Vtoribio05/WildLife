@@ -26,7 +26,7 @@ namespace WildlifeAPI.Services
             
             _logger.LogInformation("Consultando a la IA Groq...");
 
-            var url = "https://api.groq.com/openai/v1/chat/completions";
+            var url = _configuration["AiService:ApiUrl"] ?? "https://api.groq.com/openai/v1/chat/completions";
             
             var payload = new
             {
@@ -92,7 +92,7 @@ namespace WildlifeAPI.Services
                                     EnPeligroExtincion = false, // Asumimos falso por ahora
                                     Descripcion = desc,
                                     Bioma = biome,
-                                    FotoUrl = realFotoUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(animalName)}"
+                                    FotoUrl = realFotoUrl ?? string.Format(_configuration["ImageDefaults:LoremFlickrUrl"] ?? "https://loremflickr.com/320/240/{0}", Uri.EscapeDataString(animalName))
                                 };
                                 
                                 dbContext.Especies.Add(newEspecie);
@@ -116,7 +116,7 @@ namespace WildlifeAPI.Services
                             var jsonNode = System.Text.Json.Nodes.JsonNode.Parse(content) as System.Text.Json.Nodes.JsonObject;
                             if (jsonNode != null)
                             {
-                                jsonNode["FotoUrl"] = realFotoUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(animalName)}";
+                                jsonNode["FotoUrl"] = realFotoUrl ?? string.Format(_configuration["ImageDefaults:LoremFlickrUrl"] ?? "https://loremflickr.com/320/240/{0}", Uri.EscapeDataString(animalName));
                                 content = jsonNode.ToJsonString();
                             }
                         }

@@ -16,6 +16,7 @@ namespace WildlifeAPI.Data
 
             var especiesExistentes = await context.Especies.ToListAsync();
             var wikiService = serviceProvider.GetRequiredService<WildlifeAPI.Services.IWikipediaService>();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             
             // Backfill new properties for existing species
             bool hasUpdates = false;
@@ -26,7 +27,7 @@ namespace WildlifeAPI.Data
                     var wikiInfo = await wikiService.GetAnimalInfoAsync(e.NombreComun);
                     e.Descripcion = !string.IsNullOrEmpty(wikiInfo.Description) ? wikiInfo.Description : $"El {e.NombreComun} es una especie asombrosa de nuestro planeta.";
                     e.Bioma = e.Tipo == "Marino" ? "Océano" : "Terrestre / Bosque";
-                    e.FotoUrl = wikiInfo.ImageUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(e.NombreComun)}";
+                    e.FotoUrl = wikiInfo.ImageUrl ?? string.Format(configuration["ImageDefaults:LoremFlickrUrl"] ?? "https://loremflickr.com/320/240/{0}", Uri.EscapeDataString(e.NombreComun));
                     hasUpdates = true;
                 }
             }
@@ -96,7 +97,7 @@ namespace WildlifeAPI.Data
                 if (nombresExistentes.Contains(animal.Value.NombreComun))
                     continue;
                 var query = Uri.EscapeDataString(animal.Key);
-                var url = $"https://api.gbif.org/v1/occurrence/search?q={query}&limit=1&hasCoordinate=true";
+                var url = string.Format(configuration["ExternalApis:GbifApiUrl"] ?? "https://api.gbif.org/v1/occurrence/search?q={0}&limit=1&hasCoordinate=true", query);
 
                 try
                 {
@@ -121,7 +122,7 @@ namespace WildlifeAPI.Data
                             EnPeligroExtincion = animal.Value.Peligro,
                             Descripcion = !string.IsNullOrEmpty(wikiInfo.Description) ? wikiInfo.Description : $"El {animal.Value.NombreComun} es una especie asombrosa de nuestro planeta.",
                             Bioma = animal.Value.Tipo == "Marino" ? "Océano" : "Terrestre / Bosque",
-                            FotoUrl = wikiInfo.ImageUrl ?? $"https://loremflickr.com/320/240/{Uri.EscapeDataString(animal.Value.NombreComun)}"
+                            FotoUrl = wikiInfo.ImageUrl ?? string.Format(configuration["ImageDefaults:LoremFlickrUrl"] ?? "https://loremflickr.com/320/240/{0}", Uri.EscapeDataString(animal.Value.NombreComun))
                         };
 
                         especiesInsertadas.Add(nuevaEspecie);

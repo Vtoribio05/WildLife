@@ -1,9 +1,49 @@
 @inherits LayoutComponentBase
 
 <div class="page">
+    <!-- ===== HEADER PERSONALIZADO ===== -->
+    <header class="site-header" id="site-header">
+        <div class="header-container">
+            <a href="/" class="header-brand">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#f5c862"/>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="#f5c862" stroke-linecap="round"/>
+                    <circle cx="9" cy="10" r="1" fill="#f5c862"/>
+                    <circle cx="15" cy="10" r="1" fill="#f5c862"/>
+                </svg>
+                <span>WildLife</span>
+            </a>
+            <nav class="header-nav">
+                <a href="/">Inicio</a>
+                <a href="/mapa">Mapa</a>
+            </nav>
+            <a href="/mapa" class="header-cta">
+                Explorar Mapa
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main>
         @Body
     </main>
+
+    <!-- ===== FOOTER PERSONALIZADO ===== -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand-info">
+                <span class="footer-logo">WildLife</span>
+                <p>Monitoreo de vida silvestre con inteligencia artificial.</p>
+            </div>
+            <div class="footer-copy">
+                © 2026 WildLife. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
 </div>
 
 <div id="blazor-error-ui">
