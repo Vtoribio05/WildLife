@@ -1,0 +1,36 @@
+.app-footer {
+  background: rgba(10, 11, 13, 0.8);
+  border-top: 1px solid rgba(245, 200, 98, 0.2);
+  color: #94a3b8;
+  padding: 2rem 0;
+  text-align: center;
+  margin-top: auto;
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.social-links a {
+  color: #f5c862;
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.social-links a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px #f5c862, 0 0 20px #f5c862;
+}
