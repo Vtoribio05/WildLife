@@ -142,3 +142,45 @@
   font-size: 0.9rem;
   color: #cbd5e1;
 }
+
+.climate-legend {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  background: rgba(10, 11, 13, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 200, 98, 0.3);
+  border-radius: 12px;
+  padding: 15px;
+  z-index: 10;
+  color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-size: 0.85rem;
+}
+
+.climate-legend h4 {
+  margin: 0 0 10px 0;
+  color: #f5c862;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(245, 200, 98, 0.2);
+  padding-bottom: 5px;
+}
+
+.climate-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.climate-legend .legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.climate-legend .legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}

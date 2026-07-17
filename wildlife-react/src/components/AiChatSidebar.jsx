@@ -37,11 +37,21 @@ const AiChatSidebar = ({ onAnimalFound }) => {
       
       const data = await response.json();
       
-      setMessages(prev => [...prev, { isUser: false, text: data.answer || 'Sin respuesta.' }]);
+      const answer = data.answer || data.Answer || 'Sin respuesta.';
+      const animalName = data.animalName || data.AnimalName;
+      const longitude = data.longitude !== undefined ? data.longitude : (data.Longitude !== undefined ? data.Longitude : null);
+      const latitude = data.latitude !== undefined ? data.latitude : (data.Latitude !== undefined ? data.Latitude : null);
+      const description = data.description || data.Description;
+      const biome = data.biome || data.Biome;
+      const fotoUrl = data.fotoUrl || data.FotoUrl;
+
+      const normalizedData = { answer, animalName, longitude, latitude, description, biome, fotoUrl };
+
+      setMessages(prev => [...prev, { isUser: false, text: answer }]);
       
-      if (data.animalName && data.longitude !== null && data.latitude !== null) {
+      if (animalName && longitude !== null && latitude !== null) {
         if (onAnimalFound) {
-          onAnimalFound(data);
+          onAnimalFound(normalizedData);
         }
       }
     } catch (error) {

@@ -319,7 +319,7 @@
   color: #f5c862;
   font-family: monospace;
   font-size: 1.2rem;
-  margin: 0 0 2rem 0;
+  margin: 0 0 1rem 0;
   letter-spacing: 0.1em;
 }
 
@@ -327,9 +327,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   background: rgba(245, 200, 98, 0.05);
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-radius: 8px;
   border-left: 4px solid #f5c862;
 }
@@ -359,18 +359,35 @@
   animation: pulse-dot-red 1s infinite;
 }
 
+.safe-metric .metric-val {
+  color: #4ade80;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
 .holo-desc {
   color: #cbd5e1;
   line-height: 1.8;
   font-size: 1.05rem;
-  margin-bottom: auto;
   border-top: 1px dashed rgba(245, 200, 98, 0.3);
-  padding-top: 1.5rem;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 10px;
+}
+
+.holo-desc::-webkit-scrollbar {
+  width: 4px;
+}
+.holo-desc::-webkit-scrollbar-thumb {
+  background: rgba(245, 200, 98, 0.4);
+  border-radius: 10px;
 }
 
 /* Typewriter effect simulation */
 .type-writer {
-  overflow: hidden;
+  overflow-y: auto; /* Allow scrolling for typewriter */
   border-right: .15em solid #f5c862;
   white-space: pre-wrap;
   margin: 0 auto;
@@ -406,7 +423,8 @@
   justify-content: center;
   gap: 12px;
   transition: all 0.3s ease;
-  margin-top: 2rem;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .btn-tactical:hover {

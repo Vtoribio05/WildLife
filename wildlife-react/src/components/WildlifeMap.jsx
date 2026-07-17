@@ -4,7 +4,17 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './WildlifeMap.css';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
+const getClimateZone = (lat) => {
+  const absLat = Math.abs(lat);
+  if (absLat < 10) return { name: 'ZONA ECUATORIAL', color: '#ff4d4f' };
+  if (absLat < 23.5) return { name: 'ZONA TROPICAL', color: '#ffc53d' };
+  if (absLat < 35) return { name: 'ZONA SUBTROPICAL', color: '#ff7a45' };
+  if (absLat < 55) return { name: 'ZONA TEMPLADA', color: '#73d13d' };
+  if (absLat < 66.5) return { name: 'ZONA SUBPOLAR', color: '#4096ff' };
+  return { name: 'ZONA POLAR', color: '#69c0ff' };
+};
 const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecipitation = false }, ref) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -72,21 +82,11 @@ const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecip
         let lat = s.coordenadas.coordinates[1];
         let lng = s.coordenadas.coordinates[0];
         
-        let isMarino = false;
-        if (s.especie) {
-          let nombre = (s.especie.nombreComun || '').toLowerCase();
-          isMarino = s.especie.tipo === 'Pez' || 
-                         nombre.includes('ballena') || 
-                         nombre.includes('delfín') || 
-                         nombre.includes('tortuga') || 
-                         nombre.includes('mantarraya') ||
-                         nombre.includes('tiburón') ||
-                         (s.especie.bioma && s.especie.bioma.toLowerCase().includes('océano'));
-        }
+        const climate = getClimateZone(lat);
 
         const el = document.createElement('div');
-        el.className = isMarino ? 'species-marker marine' : 'species-marker land';
-        el.innerHTML = `<div class="marker-inner"></div>`;
+        el.className = 'species-marker';
+        el.innerHTML = `<div class="marker-inner" style="background: ${climate.color}; box-shadow: 0 0 15px ${climate.color}; border: 2px solid rgba(255,255,255,0.4); width: 100%; height: 100%; border-radius: 50%;"></div>`;
 
         let especieNombre = s.especie ? s.especie.nombreComun : 'Desconocido';
         let fotoUrl = s.especie && s.especie.fotoUrl ? s.especie.fotoUrl : `https://loremflickr.com/320/240/${encodeURIComponent(especieNombre)}`;
@@ -107,7 +107,7 @@ const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecip
           let dateStr = s.fecha ? new Date(s.fecha).toLocaleDateString() : 'Desconocido';
 
           el.className = 'species-marker weather-marker';
-          el.innerHTML = `<div class="marker-inner" style="background:#4ade80;"></div>`;
+          el.innerHTML = `<div class="marker-inner" style="background: ${climate.color}; box-shadow: 0 0 15px ${climate.color}; border: 2px solid rgba(255,255,255,0.4); width: 100%; height: 100%; border-radius: 50%;"></div>`;
 
           popupContent = `
             <div class="wildlife-popup weather-popup">
@@ -115,6 +115,7 @@ const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecip
                 <h3>Reporte Meteorológico</h3>
                 <div class="popup-badge-row">
                   <span class="popup-tag" style="background:rgba(245,200,98,0.2);color:#f5c862;">${bioma}</span>
+                  <span class="popup-tag" style="background:${climate.color}33;color:${climate.color};border: 1px solid ${climate.color}66;">${climate.name}</span>
                 </div>
                 <div style="font-size: 2.5rem; color:#f5c862; font-weight:800; margin:10px 0; text-shadow:0 0 10px rgba(245,200,98,0.5);">
                   ${tempC}°C
@@ -134,7 +135,10 @@ const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecip
               </div>
               <div class="popup-body">
                 <h3>${especieNombre}</h3>
-                <div class="popup-badge-row">${badge}</div>
+                <div class="popup-badge-row">
+                  ${badge}
+                  <span class="popup-tag" style="background:${climate.color}33;color:${climate.color};border: 1px solid ${climate.color}66;">${climate.name}</span>
+                </div>
                 <p>Bioma: ${bioma}</p>
                 <p>${descripcion}</p>
               </div>
@@ -211,7 +215,20 @@ const WildlifeMap = forwardRef(({ avistamientos, weatherMode = false, showPrecip
     }
   }));
 
-  return <div ref={mapContainer} className="map-container" />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div ref={mapContainer} className="map-container" />
+      <div className="climate-legend">
+        <h4>Zonas Climáticas</h4>
+        <div className="legend-item"><span className="legend-color" style={{background: '#ff4d4f'}}></span> Zona Ecuatorial</div>
+        <div className="legend-item"><span className="legend-color" style={{background: '#ffc53d'}}></span> Zona Tropical</div>
+        <div className="legend-item"><span className="legend-color" style={{background: '#ff7a45'}}></span> Zona Subtropical</div>
+        <div className="legend-item"><span className="legend-color" style={{background: '#73d13d'}}></span> Zona Templada</div>
+        <div className="legend-item"><span className="legend-color" style={{background: '#4096ff'}}></span> Zona Subpolar</div>
+        <div className="legend-item"><span className="legend-color" style={{background: '#69c0ff'}}></span> Zona Polar</div>
+      </div>
+    </div>
+  );
 });
 
 export default WildlifeMap;
