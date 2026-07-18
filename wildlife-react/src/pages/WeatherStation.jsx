@@ -41,7 +41,7 @@ const WeatherStation = () => {
     const fetchData = async () => {
       try {
         // Fetch avistamientos for the map and forecast
-        const response = await fetch('http://localhost:5085/api/Avistamientos');
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Avistamientos`);
         if (response.ok) {
           const data = await response.json();
           

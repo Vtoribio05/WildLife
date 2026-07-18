@@ -27,7 +27,7 @@ const AiChatSidebar = ({ onAnimalFound }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5085/api/Chatbot/ask', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Chatbot/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: userMsg })

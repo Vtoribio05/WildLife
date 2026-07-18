@@ -10,7 +10,7 @@ const EndangeredSpecies = () => {
   useEffect(() => {
     const fetchEndangeredSpecies = async () => {
       try {
-        const response = await fetch('http://localhost:5085/api/Especies');
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Especies`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setSpecies(data);

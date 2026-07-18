@@ -13,7 +13,7 @@ const MapExplorer = () => {
   useEffect(() => {
     const fetchAvistamientos = async () => {
       try {
-        const response = await fetch('http://localhost:5085/api/Avistamientos');
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Avistamientos`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setAllAvistamientos(data);
